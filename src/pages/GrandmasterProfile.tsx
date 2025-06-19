@@ -1,33 +1,26 @@
+import {
+  Calendar,
+  Clock3,
+  Crown,
+  ExternalLink,
+  MapPin,
+  Target,
+  Trophy,
+  Users,
+  Zap,
+} from "lucide-react";
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import {
-  Crown,
-  MapPin,
-  Calendar,
-  Users,
-  ExternalLink,
-  Trophy,
-  Target,
-  Zap,
-  Clock3,
-} from "lucide-react";
-import { fetchPlayerData } from "../services/chessApi";
 import { ErrorMessage } from "../components/ErrorMessage";
-import { ProfileSkeleton } from "../components/LoadingSkeleton";
 import { LastOnlineCounter } from "../components/LastOnlineCounter";
+import { ProfileSkeleton } from "../components/LoadingSkeleton";
+import { useGetPlayerData } from "../hooks/useGetPlayerData";
 import { formatDate } from "../utils/format";
 
 export const GrandmasterProfile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
 
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["player", username],
-    queryFn: () => fetchPlayerData(username!),
-    enabled: !!username,
-    staleTime: 60 * 1000, // 1 minute
-    gcTime: 5 * 60 * 1000, // 5 minutes
-  });
+  const { data, isLoading, error, refetch } = useGetPlayerData(username);
 
   if (isLoading) {
     return <ProfileSkeleton />;
@@ -129,9 +122,7 @@ export const GrandmasterProfile: React.FC = () => {
                   <p className="mb-2 text-lg text-gray-600 dark:text-gray-400">
                     @{profile.username}
                   </p>
-                  <LastOnlineCounter
-                    lastOnlineTimestamp={profile.last_online ?? 0}
-                  />
+                  <LastOnlineCounter />
                 </div>
 
                 <a
