@@ -3,6 +3,7 @@ import "./App.css";
 import Header from "./components/Header";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "./components/ThemeProvider";
 
 // Create a client with optimized defaults for Chess.com API
 const queryClient = new QueryClient({
@@ -37,15 +38,17 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-          <Header />
-          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <Routes>
-              <Route path="/" element={<div>Home</div>} />
-              <Route path="/player/:username" element={<div>Player</div>} />
-            </Routes>
-          </main>
-        </div>
+        <ThemeProvider>
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+            <Header />
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <Routes>
+                <Route path="/" element={<div>Home</div>} />
+                <Route path="/player/:username" element={<div>Player</div>} />
+              </Routes>
+            </main>
+          </div>
+        </ThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );
