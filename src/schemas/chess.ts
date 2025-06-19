@@ -41,6 +41,47 @@ export const PlayerProfileSchema = z.object({
   username: UsernameSchema,
 });
 
+export const GameRecordSchema = z.object({
+  win: z.number().int().min(0),
+  loss: z.number().int().min(0),
+  draw: z.number().int().min(0),
+});
+
+export const RatingDataSchema = z.object({
+  rating: RatingSchema,
+  date: TimestampSchema,
+});
+
+export const GameStatsSchema = z.object({
+  last: RatingDataSchema,
+  best: RatingDataSchema,
+  record: GameRecordSchema,
+});
+
+export const PlayerStatsSchema = z.object({
+  chess_rapid: GameStatsSchema.optional(),
+  chess_blitz: GameStatsSchema.optional(),
+  chess_bullet: GameStatsSchema.optional(),
+  chess_daily: GameStatsSchema.optional(),
+  chess960_daily: GameStatsSchema.optional(),
+  tactics: z
+    .object({
+      highest: RatingDataSchema,
+      lowest: RatingDataSchema,
+    })
+    .optional(),
+});
+
+export const GetPlayerQuerySchema = z.object({
+  username: UsernameSchema,
+  include_stats: z.coerce.boolean().default(false),
+});
+
+export const PlayerDataResponseSchema = z.object({
+  profile: PlayerProfileSchema,
+  stats: PlayerStatsSchema.optional(),
+});
+
 // Error Response Schema
 export const ApiErrorSchema = z.object({
   error: z.object({
@@ -54,3 +95,5 @@ export type ApiError = z.infer<typeof ApiErrorSchema>;
 export type PlayerProfile = z.infer<typeof PlayerProfileSchema> & {
   avatar?: string | null;
 };
+export type PlayerDataResponse = z.infer<typeof PlayerDataResponseSchema>;
+export type GetPlayerQuery = z.infer<typeof GetPlayerQuerySchema>;

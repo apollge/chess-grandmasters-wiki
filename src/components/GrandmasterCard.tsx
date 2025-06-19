@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Crown, MapPin, Calendar, Users } from "lucide-react";
 import type { PlayerProfile } from "../schemas/chess";
+import { formatDate, formatLastOnline } from "../utils/format";
 
 interface GrandmasterCardProps {
   profile: PlayerProfile;
@@ -10,24 +11,6 @@ interface GrandmasterCardProps {
 export const GrandmasterCard: React.FC<GrandmasterCardProps> = ({
   profile,
 }) => {
-  const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleDateString();
-  };
-
-  const formatLastOnline = (timestamp: number) => {
-    const now = Date.now();
-    const lastOnline = timestamp * 1000;
-    const diffInMinutes = Math.floor((now - lastOnline) / (1000 * 60));
-
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
-    } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)}h ago`;
-    } else {
-      return `${Math.floor(diffInMinutes / 1440)}d ago`;
-    }
-  };
-
   return (
     <Link
       to={`/player/${profile.username}`}

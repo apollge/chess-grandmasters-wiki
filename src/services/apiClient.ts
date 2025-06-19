@@ -2,8 +2,15 @@ import { z } from "zod";
 import {
   GrandmasterResponseSchema,
   PlayerProfileSchema,
+  PlayerStatsSchema,
+  type GetPlayerQuery,
+  type PlayerDataResponse,
 } from "../schemas/chess";
-import { ApiValidationError, createApiError } from "../utils/validation";
+import {
+  ApiValidationError,
+  createApiError,
+  validateSchema,
+} from "../utils/validation";
 
 const BASE_URL = "https://api.chess.com/pub";
 
@@ -76,5 +83,54 @@ export class ChessApiService {
     username: string
   ): Promise<z.infer<typeof PlayerProfileSchema>> {
     return apiClient.request(`/player/${username.toLowerCase()}`);
+  }
+
+  /**
+   * Fetch player statistics with validation
+   */
+  static async getPlayerStats(
+    username: string
+  ): Promise<z.infer<typeof PlayerStatsSchema>> {
+    const validatedUsername = validateSchema(
+      z.string().min(1).max(50),
+      username,
+      "Username parameter"
+    );
+
+    return apiClient.request(
+      `/player/${validatedUsername.toLowerCase()}/stats`
+    );
+  }
+
+  /**
+   * Fetch combined player data (profile + stats) with validation
+   */
+  static async getPlayerData(
+    query: GetPlayerQuery
+  ): Promise<PlayerDataResponse> {
+    // Handle profile request
+    const profilePromise = this.getPlayerProfile(query.username);
+
+    // Handle stats request conditionally
+    const statsPromise = query.include_stats
+      ? this.getPlayerStats(query.username)
+      : Promise.resolve(undefined);
+
+    const [profile, stats] = await Promise.allSettled([
+      profilePromise,
+      statsPromise,
+    ]);
+
+    // Profile is required, so throw error if it fails
+    if (profile.status === "rejected") {
+      throw profile.reason;
+    }
+
+    const result: PlayerDataResponse = {
+      profile: profile.value,
+      stats: stats.status === "fulfilled" ? stats.value : undefined,
+    };
+
+    return result;
   }
 }
