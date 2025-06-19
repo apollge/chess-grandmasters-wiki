@@ -1,10 +1,9 @@
 import { z } from "zod";
-import { GrandmasterResponseSchema } from "../schemas/chess";
 import {
-  validateSchema,
-  ApiValidationError,
-  createApiError,
-} from "../utils/validation";
+  GrandmasterResponseSchema,
+  PlayerProfileSchema,
+} from "../schemas/chess";
+import { ApiValidationError, createApiError } from "../utils/validation";
 
 const BASE_URL = "https://api.chess.com/pub";
 
@@ -21,11 +20,7 @@ class ApiClient {
   /**
    * Makes a validated API request
    */
-  async request<T>(
-    endpoint: string,
-    responseSchema: z.ZodSchema<T>,
-    options: RequestInit = {}
-  ): Promise<T> {
+  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         headers: {
@@ -44,8 +39,7 @@ class ApiClient {
         throw new ApiValidationError(response.status, apiError);
       }
 
-      const data = await response.json();
-      return validateSchema(responseSchema, data, `API Response (${endpoint})`);
+      return await response.json();
     } catch (error) {
       if (error instanceof ApiValidationError) {
         throw error;
@@ -71,10 +65,16 @@ export class ChessApiService {
    * Fetch all grandmasters with validation
    */
   static async getGrandmasters(): Promise<string[]> {
-    const response = await apiClient.request(
-      "/titled/GM",
-      GrandmasterResponseSchema
-    );
-    return response.players;
+    const response = await apiClient.request("/titled/GM");
+    return GrandmasterResponseSchema.safeParse(response).data?.players ?? [];
+  }
+
+  /**
+   * Fetch player profile with validation
+   */
+  static async getPlayerProfile(
+    username: string
+  ): Promise<z.infer<typeof PlayerProfileSchema>> {
+    return apiClient.request(`/player/${username.toLowerCase()}`);
   }
 }
