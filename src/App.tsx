@@ -2,7 +2,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Route, Routes } from "react-router-dom";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import Header from "./components/Header";
-import { ThemeProvider } from "./components/ThemeProvider";
 import { GrandmastersList } from "./pages/GrandmastersList";
 import { GrandmasterProfile } from "./pages/GrandmasterProfile";
 
@@ -39,20 +38,18 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <div className="min-h-screen bg-gray-50 transition-colors duration-200 dark:bg-gray-900">
-            <Header />
-            <main className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
-              <Routes>
-                <Route path="/" element={<GrandmastersList />} />
-                <Route
-                  path="/player/:username"
-                  element={<GrandmasterProfile />}
-                />
-              </Routes>
-            </main>
-          </div>
-        </ThemeProvider>
+        <div className="min-h-screen bg-gray-50 transition-colors duration-200 dark:bg-gray-900">
+          <Header />
+          <main className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <Routes>
+              <Route path="/" element={<GrandmastersList />} />
+              <Route
+                path="/player/:username"
+                element={<GrandmasterProfile />}
+              />
+            </Routes>
+          </main>
+        </div>
       </QueryClientProvider>
     </ErrorBoundary>
   );

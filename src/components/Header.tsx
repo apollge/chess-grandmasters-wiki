@@ -1,9 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { ArrowLeft, Crown, Moon, Sun } from "lucide-react";
-import { useTheme } from "../hooks/useTheme";
+import { ArrowLeft, Crown } from "lucide-react";
 
 const Header = () => {
-  const { isDark, toggle } = useTheme();
   const location = useLocation();
   const isProfilePage = location.pathname.startsWith("/player/");
 
@@ -29,18 +27,6 @@ const Header = () => {
               </Link>
             )}
           </div>
-
-          <button
-            onClick={toggle}
-            className="p-2 bg-gray-100 rounded-lg transition-colors dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
-            aria-label="Toggle theme"
-          >
-            {isDark ? (
-              <Sun className="w-5 h-5 text-yellow-500" />
-            ) : (
-              <Moon className="w-5 h-5 text-gray-600" />
-            )}
-          </button>
         </div>
       </div>
     </header>
